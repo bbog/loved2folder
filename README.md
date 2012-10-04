@@ -7,7 +7,7 @@ As a Last.fm user, I thought it would be awesome to have a tool that would autom
 Contributing
 ------------
 
-I'm open tu suggestions, especially since I'm using this project as a way to learn Python.
+I'm open to suggestions, especially since I'm using this project as a way to learn Python.
 
 Usage
 -----
