@@ -13,3 +13,8 @@ Usage
 -----
 
 Basically this will parse your last.fm loved tracks list then search trough a music folder for tracks. Someday.
+
+Credits
+-------
+
+This script uses Ned Batchelder's ID3Reader: http://nedbatchelder.com/code/modules/id3reader.html
