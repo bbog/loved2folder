@@ -4,6 +4,8 @@ import os
 
 import id3reader
 
+import song
+
 
 
 def listdir_fullpath(d):
@@ -125,7 +127,6 @@ else:
 
     if validYNAnswer(reParse) == True:
         getPathAndParseIt()
-
 
 
 
