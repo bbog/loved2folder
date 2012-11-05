@@ -4,9 +4,12 @@ import os
 
 import id3reader
 
-import song
+#these functions are needed to safely escape the data for the xml
+from xml.sax.saxutils import escape
+from xml.sax.saxutils import quoteattr
 
-
+def safe_xml(str):
+    return quoteattr(escape(str))
 
 def listdir_fullpath(d):
     return [os.path.join(d, f) for f in os.listdir(d)]
@@ -97,12 +100,14 @@ def getPathAndParseIt():
     
             if artist != "None" or title != "None":
                 #print (str(i) + ". " + artist + " - " + title)
-                thelist = thelist + "    <song path=\"" + filename + "\" artist=\"" + artist + "\" title=\"" + title + "\">" + artist + " - " + title + "</song>\n"
+                #the safe_xml function also generates the quotes
+                thelist = thelist + "    <song path=" + safe_xml(filename) + " artist=" + safe_xml(artist) + " title=" + safe_xml(title) + " />\n"
 
     #sorted(thelist, key = str.lower)
     thelist += "</songs>\n"
 
-    f = open('songs.xml','wb')
+    f = open('songs.xml','w')
+    #thelist = thelist.encode('utf-8')
     f.write(thelist)
     f.close()
     print "songs.xml was written"
