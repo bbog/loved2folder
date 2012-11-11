@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import song
+import parsingUtils
 
 from xml.dom import minidom
 
-def getValue(parentNode, childName):
-	return parentNode.getElementsByTagName(childName)[0].childNodes[0].nodeValue
-
-def parseLoved(xmlFile):
+def parseLovedXSPF(xmlFile):
 	xmldoc = minidom.parse(xmlFile)
 	itemlist = xmldoc.getElementsByTagName('track') 
 
 	for track in itemlist :
-		title = getValue(track, 'title')
-		artist = getValue(track, 'creator')
+		title = parsingUtils.getValue(track, 'title')
+		artist = parsingUtils.getValue(track, 'creator')
 		#print title + ' - ' + artist
 
-#parseLoved('CedikFlaw_lovedtracks.xspf')
+#parseLovedXSPF('CedikFlaw_lovedtracks.xspf')
