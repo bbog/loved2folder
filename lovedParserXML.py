@@ -13,6 +13,6 @@ def parseLovedXML(xmlFile):
 		title = parsingUtils.getValue(track, 'name')
 		artist = track.getElementsByTagName('artist')[0]
 		artist = parsingUtils.getValue(artist, 'name')
-		print title + ' - ' + artist
+		#print title + ' - ' + artist
 
-parseLovedXML('loved.xml')
+#parseLovedXML('loved.xml')
