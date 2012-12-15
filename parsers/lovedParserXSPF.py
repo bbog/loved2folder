@@ -3,6 +3,7 @@
 import parsingUtils
 
 from xml.dom import minidom
+from collections import defaultdict
 
 # returns a custom song dictionary
 # dict[artist][title] = 1 is the standard entry
@@ -11,7 +12,8 @@ def parseLovedXSPF(xmlFile):
 	xmldoc = minidom.parse(xmlFile)
 	itemlist = xmldoc.getElementsByTagName('track') 
 	
-	lovedSongsDict = parsingUtils.SongDict(dict)
+	#lovedSongsDict = parsingUtils.SongDict(dict)
+	lovedSongsDict = defaultdict(lambda: defaultdict(dict))
 
 
 	for track in itemlist :

@@ -1,22 +1,38 @@
 # -*- coding: utf-8 -*-
 
+# IMPORT
+
+# handles the folder/file parsing
 import os
-
+# handles reading the songs' ID3 tags
 import id3reader
-
+# used to import our custom inc folders
+import sys
+sys.path.insert(0, 'D:/Github/loved2folder/inc')
+sys.path.insert(1, 'D:/Github/loved2folder/parsers')
+# the XSPF file format parser
+import lovedParserXSPF
+# used to copy the loved songs to a new folder
+import shutil
+# handles exceptions
+import errno
 #these functions are needed to safely escape the data for the xml
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
 
+
+# METHODS
+
+
 def safe_xml(str):
     return quoteattr(escape(str))
+
 
 def listdir_fullpath(d):
     return [os.path.join(d, f) for f in os.listdir(d)]
 
 
-
-#parses all the files in a directory and returns an array with the filenames
+# parses all the files in a directory and returns an array with the filenames
 def parse_dirs(d):
     allfiles = []
     for dirname, dirnames, filenames in os.walk(d):
@@ -25,10 +41,9 @@ def parse_dirs(d):
         for filename in filenames:
             allfiles.append(os.path.join(dirname, filename))
     return allfiles
-    
 
 
-#makes sure the value is utf8 valid and an string
+# makes sure the value is utf8 valid and an string
 def ensureutf8andstring(s):
     if isinstance(s, unicode):
         try:
@@ -39,36 +54,17 @@ def ensureutf8andstring(s):
     return str(s)
 
 
-
-#makes sure you receive a valid Yes or No answer
-def validYNAnswer(ans):
-    if ans == 'y':
-        return True
-    if ans == 'Y':
-        return True
-    if ans == 'Yes':
-        return True
-    if ans == 'yes':
-        return True
-    if ans == 'YES':
-        return True
-    if ans == 'N':
-        return False
-    if ans == 'n':
-        return False
-    if ans == 'No':
-        return False
-    if ans == 'no':
-        return False
-    if ans == 'NO':
-        return False
-
-    return None
+# we make sure the destination folder of the loved tracks exists
+def makePathOk(path):
+    try:
+        os.makedirs(path)
+    except OSError as exception:
+        if exception.errno != errno.EEXIST:
+            raise
 
 
-
-#gets the path to the music folder and parses the filelist, writing the result to songs.xml
-def getPathAndParseIt():
+#parses the songs from the given folder and checks each song to see if it's loved or not
+def searchForLovedSongs(searchForLovedSongs):
     path = raw_input("Enter the path to your music folder: ")
     if not os.path.exists(path):
         while True:
@@ -76,13 +72,13 @@ def getPathAndParseIt():
             if not os.path.exists(path):
                 break
 
+    destination = raw_input("Enter the path to destination folder (the loved songs will be copyied there): ")
+    makePathOk(destination)
+
     filelist = parse_dirs(path)
 
-    thelist  = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-    thelist += "<songs>\n"
-
     print "There were " + str(len(filelist)) + " files found"
-    print "Please wait while the XML is built"
+    print "Please wait while the songs are verified (it might take a while)"
 
     for filename in filelist:     
         if filename[-4:] == ".mp3":
@@ -99,18 +95,15 @@ def getPathAndParseIt():
                 title = ensureutf8andstring(id3r.getValue('title'))
     
             if artist != "None" or title != "None":
-                #print (str(i) + ". " + artist + " - " + title)
-                #the safe_xml function also generates the quotes
-                thelist = thelist + "    <song path=" + safe_xml(filename) + " artist=" + safe_xml(artist) + " title=" + safe_xml(title) + " />\n"
+                if lovedSongs[artist][title] == 1:
+                    try: 
+                        shutil.copy(filename, destination)
+                    except:
+                        print '"' + artist + ' - ' + title + '" could not be copied'
+                    else:
+                        print '"' + artist + ' - ' + title + '" was successfully copied'
 
-    #sorted(thelist, key = str.lower)
-    thelist += "</songs>\n"
-
-    f = open('songs.xml','w')
-    #thelist = thelist.encode('utf-8')
-    f.write(thelist)
-    f.close()
-    print "songs.xml was written"
+    print "parsing done"
 
 #clear the scren
 clear = lambda: os.system('cls')
@@ -118,21 +111,6 @@ clear()
 
 print ("start")
 
-#we check to see if we already parsed the music folder
-if not os.path.exists("songs.xml"):
-    getPathAndParseIt()
-else:
-    #maybe we need to rebuild the songs list
-    validationMessage = "It seems your music folder was already parsed. Do you wish to update the songs list? Y / N: "
+lovedSongs = lovedParserXSPF.parseLovedXSPF('CedikFlaw_lovedtracks.xspf')
 
-    while True:
-        reParse = raw_input(validationMessage).strip()
-        if not validYNAnswer(reParse) is None:
-            break
-
-    if validYNAnswer(reParse) == True:
-        getPathAndParseIt()
-
-
-
-
+searchForLovedSongs(lovedSongs)
